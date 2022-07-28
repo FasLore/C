@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void print_res(int rows, int cols, int *m)
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            printf("%2d ", m[i*cols+j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+
+
+
+int main(int argc, const char * argv[])
+{
+    //matrice di dimensione dim con numeri a random
+    int r1,c1;
+    printf("inserire le dimensione della matrice: ");
+    scanf("%d %d",&r1,&c1);
+    srand((unsigned)time(NULL));
+    int a[r1][c1];
+    printf("A: \n");
+    for(int i=0;i<r1;i++)
+    {
+        for(int j=0;j<c1;j++)
+        {
+            a[i][j]=(int)(rand()%21-10); //-10<x<10
+            printf("%d ",a[i][j]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    int r2,c2;
+    printf("inserire le dimensione della matrice: ");
+    scanf("%d %d",&r2,&c2);
+    srand((unsigned)time(NULL));
+    int b[r2][c2];
+    printf("B: \n");
+    for(int k=0;k<r2;k++)
+    {
+        for(int p=0;p<c2;p++)
+        {
+            b[k][p]=(int)(rand()%21-10); //-10<x<10
+            printf("%d ",b[k][p]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+    int c[r1][c2];
+    for(int t=0;t<r1;t++)
+    {
+        for(int h=0;h<c2;h++)
+        {
+            int RIS=0;
+            for(int s=0;s<r2;s++)
+            {
+                RIS =RIS+a[t][s]*b[s][h];
+            }
+            c[t][h]=RIS;
+        }
+    }
+    printf("il prodotto tra le matrici a(%d,%d)*b(%d,%d)=c(%d,%d)\n",r1,c1,r2,c2,r1,c2);
+    print_res(r1,c2,(int*)c);
+    return 0;
+}
