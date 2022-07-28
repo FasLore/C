@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+void print_matrix(int rows, int cols, int m[][cols])
+{
+    for (int i = 0; i < rows; i++)
+    {
+        for (int j = 0; j < cols; j++)
+        {
+            printf("%2d ", m[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+
+
+
+
+
+
+int main(int argc, char *argv[])
+{
+    FILE *matrix_file = NULL;
+    matrix_file = fopen(argv[1], "rb");
+    
+    if (matrix_file == NULL) {
+        printf("Errore nell'apertura del file %s\n", argv[1]);
+        exit(EXIT_FAILURE);
+    }
+    //si alloca una array si legge il file con fread(buffer, tipo,quanti caratteri, e da quale file)
+    int mat_dims[2];
+    fread(mat_dims, sizeof(int), 2, matrix_file);
+    //si alloca una matrice matrix e si legge il file per rows e cols
+    int rows = mat_dims[0];
+    int cols = mat_dims[1];
+    
+    int matrix[rows][cols];
+    fread(matrix, sizeof(int), rows*cols, matrix_file);
+    fclose(matrix_file);
+    //si stampa tale matrice
+    print_matrix(rows, cols, matrix);
+    printf("\n\n");
+ 
+    
+    //apertura del 2°file lettura delle sue rig e col(verifica se esse sono uguali a quelle della matrice A) successivamente si legge tale file e si e si inserisce ogni carattere nella matrice m[rows][cols]
+    FILE *mask_file = fopen(argv[2], "rb");
+    if (mask_file == NULL) {
+        printf("Errore nell'apertura del file %s\n", argv[2]);
+        exit(EXIT_FAILURE);
+    }
+    
+    int mask_dims[2];
+    fread(mask_dims, sizeof(int), 2, mask_file);
+    
+    if (rows != mask_dims[0] || cols != mask_dims[1]) {
+        printf("Le dimensioni della matrice e della maschera non coincidono!\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    int mask[rows][cols];
+    fread(mask, sizeof(int), rows*cols, mask_file);
+    fclose(mask_file);
+    //si stampa tale matrice
+    print_matrix(rows, cols, mask);
+    printf("\n\n");
+    
+    int maxc=0;
+    int maxr=rows;
+    for(int i=0;i<rows;i++)// stabilisco quante righe e quante col della mia nuova matrice
+    {
+        int one=0;
+        for(int j=0;j<cols;j++)
+        {
+          if(mask[i][j]!=0)
+           {
+               one++;
+           }
+        }
+        if(maxc<one) maxc=one; // tengo traccia del massimo di 1 che incontro in una riga
+        if(one==0) maxr--; //se in una riga non incotro almeno un 1 vuol dire che quela riga non la devo contare
+    }
+    //in questo modo conosco quante rig e quante col sarà la mia nuova matrice
+    int result[maxr][maxc];
+    memset(result,0,maxr*maxc*sizeof(int)); //setta il valore '0' su tutta la matrice result (setta ogni byte a 0 che sono 4)
+    int r=0;
+    for (int i=0;i<rows;i++)
+    {
+        int c=0;
+        for (int j=0;j<cols;j++)
+        {
+            if(mask[i][j]==1)
+            {
+            result[r][c]=matrix[i][j];
+            c++;
+            }
+        }
+        if(c!=0)// se c è uguale a 0 r rimane a 0
+        {
+            r++;
+        }
+    }
+    print_matrix(maxr,maxc,result);
+    return 0;
+}
